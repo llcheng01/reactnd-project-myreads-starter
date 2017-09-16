@@ -1,4 +1,5 @@
 import React from 'react'
+import { Route } from 'react-router-dom'
 import * as BooksAPI from './BooksAPI'
 import ListBooks from './ListBooks'
 import SearchBooks from './SearchBooks'
@@ -17,7 +18,7 @@ class BooksApp extends React.Component {
        * users can use the browser's back and forward buttons to navigate between
        * pages, as well as provide a good URL they can bookmark and share.
        */
-        showSearchPage: false,
+        // showSearchPage: false,
         currentlyReadingBooks: [], 
         wantToReadBooks: [],
         readBooks: [] 
@@ -48,17 +49,16 @@ class BooksApp extends React.Component {
                 readBooks: this.state.readBooks.concat(book),         wantToReadBooks: this.state.wantToReadBooks.filter((b)=>b.id !== book.id), currentlyReadingBooks: this.state.currentlyReadingBooks.filter((b)=>b.id !== book.id) })
             }
         }).catch((error) => {console.log(error); })
-        
     }
 
   render() {
     return (
       <div className="app">
-        {this.state.showSearchPage ? (
-            <SearchBooks />
-        ) : (
-            <ListBooks currentlyReading={this.state.currentlyReadingBooks} wantToRead={this.state.wantToReadBooks} read={this.state.readBooks} updateBookShelf={this.handleUpdate}/>
+        <Route exact path="/" render={() => (
+                <ListBooks currentlyReading={this.state.currentlyReadingBooks} wantToRead={this.state.wantToReadBooks} read={this.state.readBooks} updateBookShelf={this.handleUpdate} />
             )}
+        />
+        <Route path="/search" component={SearchBooks} />
       </div>
     )
   }
