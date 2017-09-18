@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import React from 'react'
 import { Route } from 'react-router-dom'
 import * as BooksAPI from './BooksAPI'
@@ -21,7 +22,24 @@ class BooksApp extends React.Component {
         // showSearchPage: false,
         currentlyReadingBooks: [], 
         wantToReadBooks: [],
-        readBooks: [] 
+        readBooks: [],  
+        searchedBooks: []
+    }
+
+    doBookSearch(term) {
+        term = term.trim();
+        console.log("Do Search:" + term);
+        if (term) {
+            BooksAPI.search(term, 2).then(
+                (books) => {
+                    
+                    this.setState({searchedBooks: books});
+                }
+            ).catch((error) => { 
+                this.setState({searchedBooks: []})
+                console.log(error); 
+            })
+        }
     }
 
     fetchMyBooks() {
@@ -52,13 +70,16 @@ class BooksApp extends React.Component {
     }
 
   render() {
+    const bookSearch = _.debounce((term) => { this.doBookSearch(term) }, 300);
     return (
       <div className="app">
         <Route exact path="/" render={() => (
                 <ListBooks currentlyReading={this.state.currentlyReadingBooks} wantToRead={this.state.wantToReadBooks} read={this.state.readBooks} updateBookShelf={this.handleUpdate} />
             )}
         />
-        <Route path="/search" component={SearchBooks} />
+        <Route path="/search" render={() => (<SearchBooks books={this.state.searchedBooks} onSearchTermChange={bookSearch} updateBookShelf={this.handleUpdate}/>
+            )} 
+        />
       </div>
     )
   }

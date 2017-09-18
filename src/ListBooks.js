@@ -13,7 +13,6 @@ class ListBooks extends Component {
     }
 
     handleOptionChange(book, event) {
-        console.log("Changed: " + book.id + " to shelf: " + event.target.value);
         this.props.updateBookShelf(book, event.target.value);
     }
   
