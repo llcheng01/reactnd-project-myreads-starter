@@ -17,7 +17,54 @@ class ListBooks extends Component {
     }
   
     render() {
-        const { currentlyReading, wantToRead, read } = this.props
+        const { books } = this.props
+        // Create three arrays 
+        const currentlyReading = this.props.books.filter((b) => "currentlyReading" ===b.shelf);
+
+        console.log("currentlyReading: " + currentlyReading.length);
+        const wantToRead = this.props.books.filter((b) => "wantToRead" ===b.shelf);
+        
+        console.log("wantToRead: " + wantToRead.length);
+        const read = this.props.books.filter((b) => "read" === b.shelf);
+
+        console.log("read: " + read.length);
+        const allBooks = [currentlyReading, wantToRead, read];
+
+        const titles = ["Currently Reading", "Want to Read", "Read"];
+
+        const combined = titles.map((t, i) => {return [t,allBooks[i]];}); 
+
+        const bookLists = combined.map((c) => {
+                return (
+                    <div key={c[0].length} className="bookshelf">
+                        <h2 className="bookshelf-title">{c[0]}</h2>
+                        <div className="bookshelf-books"> 
+                            <ol className="books-grid">
+                                {c[1].map((book) => (
+                                <li key={book.id}>
+                                    <div className="book">
+                                        <div className="book-top">
+                                            <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.smallThumbnail})` }}></div>
+                                            <div className="book-shelf-changer">
+                                                <select value={book.shelf} onChange={(e) => this.handleOptionChange(book, e)}>
+                                                    <option value="none" disabled>Move to...</option>
+                                                    <option value="currentlyReading" defaultValue>Currently Reading</option>
+                                                    <option value="wantToRead">Want to Read</option>
+                                                    <option value="read">Read</option>
+                                                    <option value="none">None</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div className="book-title">{book.title}</div>
+                                        <div className="book-authors">{book.authors[0]}</div>
+                                    </div>
+                                </li>
+                            ))}
+                            </ol>
+                        </div>
+                    </div>
+                );
+            });
 
         return (
             <div className="list-books">
@@ -25,89 +72,7 @@ class ListBooks extends Component {
                   <h1>MyReads</h1>
                 </div>
                 <div className="list-books-content">
-                    <div>
-                        <div className="bookshelf">
-                            <h2 className="bookshelf-title">Currently Reading</h2>
-                            <div className="bookshelf-books"> 
-                                <ol className="books-grid">
-                                    {currentlyReading.map((book) => (
-                                    <li key={book.id}>
-                                        <div className="book">
-                                            <div className="book-top">
-                                                <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.smallThumbnail})` }}></div>
-                                                <div className="book-shelf-changer">
-                                                    <select value="currentlyReading" onChange={(e) => this.handleOptionChange(book, e)}>
-                                                        <option value="none" disabled>Move to...</option>
-                                                        <option value="currentlyReading" defaultValue>Currently Reading</option>
-                                                        <option value="wantToRead">Want to Read</option>
-                                                        <option value="read">Read</option>
-                                                        <option value="none">None</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div className="book-title">{book.title}</div>
-                                            <div className="book-authors">{book.authors[0]}</div>
-                                        </div>
-                                    </li>
-                                ))}
-                                </ol>
-                            </div>
-                        </div>
-                        <div className="bookshelf">
-                            <h2 className="bookshelf-title">Want to Read</h2>
-                            <div className="bookshelf-books"> 
-                                <ol className="books-grid">
-                                {wantToRead.map((book) => (
-                                    <li key={book.id}>
-                                        <div className="book">
-                                            <div className="book-top">
-                                                <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.smallThumbnail})` }}></div>
-                                                <div className="book-shelf-changer">
-                                                    <select  value="wantToRead" onChange={(e) => this.handleOptionChange(book, e)}>
-                                                        <option value="none" disabled>Move to...</option>
-                                                        <option value="currentlyReading">Currently Reading</option>
-                                                        <option value="wantToRead" defaultValue>Want to Read</option>
-                                                        <option value="read">Read</option>
-                                                        <option value="none">None</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div className="book-title">{book.title}</div>
-                                            <div className="book-authors">{book.authors[0]}</div>
-                                        </div>
-                                    </li>
-                                ))}
-                                </ol>
-                            </div>
-                        </div>
-                        <div className="bookshelf">
-                            <h2 className="bookshelf-title">Read</h2>
-                            <div className="bookshelf-books"> 
-                                <ol className="books-grid">
-                                {read.map((book) => (
-                                    <li key={book.id}>
-                                        <div className="book">
-                                            <div className="book-top">
-                                                <div className="book-cover" style={{ width: 128, height: 193, backgroundImage: `url(${book.imageLinks.smallThumbnail})` }}></div>
-                                                <div className="book-shelf-changer">
-                                                    <select value="read" onChange={(e) => this.handleOptionChange(book, e)}>
-                                                        <option value="none" disabled>Move to...</option>
-                                                        <option value="currentlyReading">Currently Reading</option>
-                                                        <option value="wantToRead">Want to Read</option>
-                                                         <option value="read" defaultValue>Read</option>
-                                                        <option value="none">None</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div className="book-title">{book.title}</div>
-                                            <div className="book-authors">{book.authors[0]}</div>
-                                        </div>
-                                    </li>
-                                ))}
-                                </ol>
-                            </div>
-                        </div>
-                    </div>
+                { bookLists } 
                </div>
                <div className="open-search">
                 <Link to="/search">Add a book</Link> 

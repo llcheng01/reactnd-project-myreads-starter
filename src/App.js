@@ -13,16 +13,7 @@ class BooksApp extends React.Component {
         this.handleUpdate = this.handleUpdate.bind(this);
     }
     state = {
-      /**
-       * TODO: Instead of using this state variable to keep track of which page
-       * we're on, use the URL in the browser's address bar. This will ensure that
-       * users can use the browser's back and forward buttons to navigate between
-       * pages, as well as provide a good URL they can bookmark and share.
-       */
-        // showSearchPage: false,
-        currentlyReadingBooks: [], 
-        wantToReadBooks: [],
-        readBooks: [],  
+        books: [],
         searchedBooks: []
     }
 
@@ -44,7 +35,7 @@ class BooksApp extends React.Component {
 
     fetchMyBooks() {
         BooksAPI.getAll().then((books) => {
-            this.setState({ currentlyReadingBooks: books.filter((b)=>"currentlyReading"===b.shelf), wantToReadBooks: books.filter((b)=>"wantToRead"===b.shelf), readBooks: books.filter((b)=>"read"===b.shelf) })
+            this.setState({books: books})
         }).catch((error) => { console.log(error); })
     }
 
@@ -55,16 +46,19 @@ class BooksApp extends React.Component {
     handleUpdate(book, shelf) {
         const updatedBooks = BooksAPI.update(book, shelf).
         then(res => {
-            
-            if ("currentlyReading" === shelf) {
-                this.setState({
-                currentlyReadingBooks: this.state.currentlyReadingBooks.concat(book), wantToReadBooks: this.state.wantToReadBooks.filter((b)=>b.id !== book.id), readBooks: this.state.readBooks.filter((b)=>b.id !== book.id) })
-            } else if ("wantToRead" === shelf) {
-                this.setState({
-                wantToReadBooks: this.state.wantToReadBooks.concat(book), currentlyReadingBooks: this.state.currentlyReadingBooks.filter((b)=>b.id !== book.id), readBooks: this.state.readBooks.filter((b)=>b.id !== book.id) })
-            } else if ("read" === shelf) {
-                this.setState({
-                readBooks: this.state.readBooks.concat(book),         wantToReadBooks: this.state.wantToReadBooks.filter((b)=>b.id !== book.id), currentlyReadingBooks: this.state.currentlyReadingBooks.filter((b)=>b.id !== book.id) })
+            const bookIds = this.state.books.map((b) => { return b.id });
+
+            if (bookIds.includes(book.id)) {
+                console.log("Update shelf for existing books");
+                // remove existing book and add the updated version
+                // Change the shelf for original book
+                book.shelf = shelf;
+                const newBooksList = this.state.books.filter((b) => { if (b.id !== book.id) return b; });
+                newBooksList.push(book);
+                this.setState({books: newBooksList});
+            } else {
+                console.log("Add new books");
+                this.setState({books: this.state.books.concat(book) });   
             }
         }).catch((error) => {console.log(error); })
     }
@@ -74,7 +68,7 @@ class BooksApp extends React.Component {
     return (
       <div className="app">
         <Route exact path="/" render={() => (
-                <ListBooks currentlyReading={this.state.currentlyReadingBooks} wantToRead={this.state.wantToReadBooks} read={this.state.readBooks} updateBookShelf={this.handleUpdate} />
+                <ListBooks books={this.state.books} updateBookShelf={this.handleUpdate} />
             )}
         />
         <Route path="/search" render={() => (<SearchBooks books={this.state.searchedBooks} onSearchTermChange={bookSearch} updateBookShelf={this.handleUpdate}/>
