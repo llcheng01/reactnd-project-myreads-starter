@@ -18,16 +18,14 @@ class ListBooks extends Component {
   
     render() {
         const { books } = this.props
+
         // Create three arrays 
         const currentlyReading = this.props.books.filter((b) => "currentlyReading" ===b.shelf);
 
-        console.log("currentlyReading: " + currentlyReading.length);
         const wantToRead = this.props.books.filter((b) => "wantToRead" ===b.shelf);
         
-        console.log("wantToRead: " + wantToRead.length);
         const read = this.props.books.filter((b) => "read" === b.shelf);
 
-        console.log("read: " + read.length);
         const allBooks = [currentlyReading, wantToRead, read];
 
         const titles = ["Currently Reading", "Want to Read", "Read"];

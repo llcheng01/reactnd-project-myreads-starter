@@ -19,18 +19,40 @@ class BooksApp extends React.Component {
 
     doBookSearch(term) {
         term = term.trim();
-        console.log("Do Search:" + term);
         if (term) {
             BooksAPI.search(term, 2).then(
                 (books) => {
-                    
-                    this.setState({searchedBooks: books});
+                    const mergedResult = this.mergeArrays(books, this.state.books); 
+                    this.setState({searchedBooks: mergedResult});
                 }
             ).catch((error) => { 
                 this.setState({searchedBooks: []})
                 console.log(error); 
             })
         }
+    }
+
+    mergeArrays(searched, existed) {
+        // Convert search result to hashmap
+        const merged = searched.reduce((map, obj) => {
+                map[obj.id] = obj;
+                return map;
+            }, new Map()); 
+
+        existed.forEach((b) => {
+            const search = merged[b.id];
+            if (search) {
+                search['shelf'] = b.shelf;
+            }
+        });
+
+        // Back to array
+        let values = [];
+
+        Object.keys(merged).forEach((key)=>{
+                values.push(merged[key]);
+            });
+        return values;
     }
 
     fetchMyBooks() {
@@ -40,6 +62,7 @@ class BooksApp extends React.Component {
     }
 
     componentDidMount() {
+        console.log("I am being called!");
         this.fetchMyBooks()
     }
 
@@ -49,7 +72,6 @@ class BooksApp extends React.Component {
             const bookIds = this.state.books.map((b) => { return b.id });
 
             if (bookIds.includes(book.id)) {
-                console.log("Update shelf for existing books");
                 // remove existing book and add the updated version
                 // Change the shelf for original book
                 book.shelf = shelf;
@@ -57,8 +79,7 @@ class BooksApp extends React.Component {
                 newBooksList.push(book);
                 this.setState({books: newBooksList});
             } else {
-                console.log("Add new books");
-                this.setState({books: this.state.books.concat(book) });   
+                this.setState({books: this.state.books.push(book) });   
             }
         }).catch((error) => {console.log(error); })
     }

@@ -20,7 +20,7 @@ class SearchBooks extends Component {
     }
 
     render() {
-        const { books } = this.props;
+        const { books } = this.props || [];
 
         return (
             
