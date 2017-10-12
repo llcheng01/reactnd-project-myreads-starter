@@ -79,7 +79,10 @@ class BooksApp extends React.Component {
                 newBooksList.push(book);
                 this.setState({books: newBooksList});
             } else {
-                this.setState({books: this.state.books.push(book) });   
+                const oldBooksList = this.state.books;
+                const newBooksList = oldBooksList.concat(book);
+                // This is so weird. I guess push directly change this.state.books in to just a number? So filter method does not work!! 
+                this.setState({books: newBooksList}, () =>{ console.log(this.state.books);});   
             }
         }).catch((error) => {console.log(error); })
     }
